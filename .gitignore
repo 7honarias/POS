@@ -1,0 +1,23 @@
+# Archivos de configuración local
+*.venv
+*.conda
+*.idea/
+.mypy_cache/
+.pytest_cache/
+
+# Archivos de base de datos
+db.sqlite3
+test_db.sqlite3
+
+# Archivos de compilación y caché
+*.pyc
+*.log
+__pycache__/
+local_settings.py
+
+# Archivos de medios estáticos
+media/
+static/
+
+# Directorios de migración
+migrations/

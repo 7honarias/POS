@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div>
+    <h1>Ventas</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <a href="{% url 'AddVenta' %}">
+                    <button type="button" class="btn btn-success">
+                        Agregar Venta
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-body" style="overflow:scroll">
+            <table class="table table-hover table-primary" id="myTable">
+                <thead>
+                    <tr>
+                        <th># ID</th>
+                        <th>producto</th>
+                        <th>cantidad</th>
+                        <th>precio</th>
+                        <th>Total</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark">
+                    {% for i in products %}
+                    <tr>
+                        <td>{{i.id}}</td>
+                        <td>{{i.producto}}</td>
+                        <td>{{i.cantidad}}</td>
+                        <td>{{i.precio|currency}}</td>
+                        <td>{{i.subtotal|currency}}</td>
+                        <td>
+                            <button onclick="editarProduct('{{i.id}}', '{{i.price}}', '{{i.cost}}', '{{i.quantity}}',)" class="btn btn-dark-outline btn-sm" data-toggle="modal"
+                                href="#EditarPersonalModal"><img src="{% static 'index/img/editar.png' %}" alt="Error"
+                                    width="30"></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div>
+                <h4>total: {{ egreso.total | currency }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+    
+</div>
+{% endblock %}
