@@ -21,3 +21,4 @@ static/
 
 # Directorios de migración
 migrations/
+.env
