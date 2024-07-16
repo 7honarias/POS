@@ -2,14 +2,18 @@ asgiref==3.8.1
 Brotli==1.1.0
 cffi==1.16.0
 cssselect2==0.7.0
+dj-database-url==2.2.0
 Django==4.2.11
 django-humanize==0.1.2
 django-weasyprint==2.3.0
 django-widget-tweaks==1.5.0
 fonttools==4.51.0
+gunicorn==22.0.0
 html5lib==1.1
 humanize==4.9.0
+packaging==24.1
 pillow==10.2.0
+psycopg2==2.9.9
 pycparser==2.22
 pydyf==0.9.0
 pyphen==0.14.0
@@ -21,5 +25,3 @@ tzdata==2024.1
 weasyprint==61.2
 webencodings==0.5.1
 zopfli==0.2.3
-gunicorn==21.2.0
-
