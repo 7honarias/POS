@@ -105,29 +105,55 @@
                         <tr>
                             <th>Método</th>
                             <th>Monto {{moneda}}</th>
+                            <th>Acción</th>
                         </tr>
                     </thead>
                     <tbody class="text-dark">
                         <tr>
-                            <td>Efectivo {{moneda}} : </td>
-                            <td><input type="number" class="form-control" id="efectivo" value=""></td>
+                            <td>
+                                <select id="metodo_pago" class="form-control">
+                                    <option value="" selected disabled>Selecciona un método de pago</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="monto_pago">
+                            </td>
+                            <td>
+                                <button id="btn_add_pay" class="btn btn-primary" onclick="agregarPago()"><i class="fas fa-plus"></i></button>
+                            </td>
                         </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td>Tarjeta {{moneda}} : </td>
-                            <td><input type="number" class="form-control" id="tarjeta" value=""></td>
+                            <th>Total</th>
+                            <th>Pagado</th>
+                            <th>Pendiente</th>
+                            <th>Cambio</th>
                         </tr>
+                    </thead>
+                    <tbody>
                         <tr>
-                            <td>Transferencia {{moneda}} : </td>
-                            <td><input type="number" class="form-control" id="transferencia" value=""></td>
+                            <td><input type="text" class="form-control" id="monto_to_pay" value="0" readonly></td>
+                            <td><input type="text" class="form-control" id="pagado" value="0" readonly></td>
+                            <td><input type="text" class="form-control" id="pendiente" value="0" readonly></td>
+                            <td><input type="text" class="form-control" id="cambio" value="0" readonly></td>
                         </tr>
+                    </tbody>
+                </table>
+                <table class="table table-hover" id="pagos_table">
+                    <thead>
                         <tr>
-                            <td>Vales {{moneda}} : </td>
-                            <td><input type="number" class="form-control" id="vales" value=""></td>
+                            <th>Método</th>
+                            <th>Monto {{moneda}}</th>
                         </tr>
-                        <tr>
-                            <td>Otro {{moneda}} : </td>
-                            <td><input type="number" class="form-control" id="otro" value=""></td>
-                        </tr>
+                    </thead>
+                    <tbody id="pagos_body">
+                        <!-- Pagos agregados aparecerán aquí -->
                     </tbody>
                 </table>
             </div>
@@ -136,12 +162,12 @@
                     Cerrar
                     <i class="fas fa-window-close"></i>
                 </button>
-                <button onclick="saveData()" id="btn" class="btn btn-success btn-lg">Agregar Venta <i
-                        class="fas fa-money-bill"></i></button>
+                <button onclick="saveData()" id="btn" class="btn btn-success btn-lg">Agregar Venta <i class="fas fa-money-bill"></i></button>
             </div>
         </div>
     </div>
 </div>
+
 <div class="row mt-5">
     <div class="col-4">
         <div class="input-group">
@@ -233,7 +259,7 @@
 </div>
 <div class="row text-center mt-4">
     <div class="col-12">
-        <button data-toggle="modal" href="#ConfirmacionModal" class="btn btn-success btn-block">Agregar Venta <i
+        <button data-toggle="modal" href="#ConfirmacionModal" id="btn_pay" class="btn btn-success btn-block">Agregar Venta <i
                 class="fas fa-money-bill"></i></button>
     </div>
 </div>
@@ -254,7 +280,13 @@
     var verts = {
         items: {
             total: 0.00,
-            products: []
+            products: [],
+            pagado: 0.00,
+            pendiente: 0.00,
+            cambio: 0.00,
+            transferencia: 0.00,
+            tarjeta: 0.00,
+            efectivo: 0.00
         },
         calculate: function () {
             // Calcular subtotal 
@@ -267,7 +299,7 @@
 
             });
             this.items.total = parseFloat(calculatedtotal)
-            document.getElementById("total").innerHTML = "Total {{moneda}}" + parseFloat(this.items.total).toFixed(2);
+            document.getElementById("total").innerHTML = "Total {{moneda}}" + parseFloat(this.items.total).toFixed(0);
         },
 
         list: function () {
@@ -324,8 +356,100 @@
                 },
             });
         },
-
     };
+
+
+function agregarPago() {
+    var metodo = document.getElementById("metodo_pago").value;
+    var monto = parseFloat(document.getElementById("monto_pago").value.replace(/[^0-9.-]+/g, "")) || 0;
+
+    if (metodo && monto > 0) {
+        if (metodo === "efectivo") {
+            verts.items.efectivo += monto;
+        } else if (metodo === "tarjeta") {
+            verts.items.tarjeta += monto;
+        } else if (metodo === "transferencia") {
+            verts.items.transferencia += monto;
+        }
+
+        var pagosTable = document.getElementById("pagos_body");
+        var newRow = pagosTable.insertRow();
+        
+        var cellMetodo = newRow.insertCell(0);
+        var cellMonto = newRow.insertCell(1);
+        var cellAccion = newRow.insertCell(2);
+        
+        cellMetodo.innerHTML = metodo.charAt(0).toUpperCase() + metodo.slice(1);
+        cellMonto.innerHTML = formatToCOP(monto);
+        
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "btn btn-danger btn-sm";
+        deleteButton.onclick = function() {
+            eliminarPago(newRow, metodo, monto);
+        };
+        cellAccion.appendChild(deleteButton);
+
+        actualizarValores();
+
+        document.getElementById("metodo_pago").value = "";
+        document.getElementById("monto_pago").value = "";
+    } else {
+        alert("Por favor selecciona un método de pago y especifica un monto válido.");
+    }
+}
+
+function eliminarPago(row, metodo, monto) {
+    row.parentNode.removeChild(row);
+
+    if (metodo === "efectivo") {
+        verts.items.efectivo -= monto;
+    } else if (metodo === "tarjeta") {
+        verts.items.tarjeta -= monto;
+    } else if (metodo === "transferencia") {
+        verts.items.transferencia -= monto;
+    }
+
+    actualizarValores();
+}
+
+function actualizarValores() {
+    verts.items.pagado = verts.items.efectivo + verts.items.tarjeta + verts.items.transferencia;
+    verts.items.pendiente = verts.items.total - verts.items.pagado;
+
+    if (verts.items.pendiente < 0) {
+        verts.items.pendiente = 0;
+    }
+
+    if (verts.items.pagado > verts.items.total) {
+        verts.items.cambio = verts.items.pagado - verts.items.total;
+    } else {
+        verts.items.cambio = 0;
+    }
+
+    if (verts.items.pagado > verts.items.total) {
+        document.getElementById('btn_add_pay').disabled = true;
+    } else {
+        document.getElementById('btn_add_pay').disabled = false;
+    }
+
+    document.getElementById("pagado").value = formatToCOP(verts.items.pagado);
+    document.getElementById("pendiente").value = formatToCOP(verts.items.pendiente);
+    document.getElementById("cambio").value = formatToCOP(verts.items.cambio);
+    document.getElementById("monto_to_pay").value = formatToCOP(verts.items.total);
+}
+
+function formatToCOP(value) {
+    return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP' });
+}
+
+$('#btn_pay').on('click', function () {
+         // Actualizar el valor del input monto_pago con el total calculado
+        $('#monto_to_pay').val(formatToCOP(verts.items.total));
+        actualizarValores();
+    });
+
+
     // Autocomplete
     $(function () {
     var selectingFirstItem = false; // Variable para controlar la selección del primer ítem
@@ -441,11 +565,11 @@
                 'cliente': document.getElementById("cliente").value,
                 'comentarios': document.getElementById("comentarios").value,
                 'ticket': document.getElementById("impresion").value,
-                'efectivo': document.getElementById("efectivo").value,
-                'tarjeta': document.getElementById("tarjeta").value,
-                'transferencia': document.getElementById("transferencia").value,
-                'vales': document.getElementById("vales").value,
-                'otro': document.getElementById("otro").value,
+                'efectivo': verts.items.efectivo,
+                'tarjeta': verts.items.tarjeta,
+                'transferencia': verts.items.transferencia,
+                'vales': 0,
+                'otro': 0,
                 'desglosar': desglosar,
                 'total': verts.items.total,
                 'verts': JSON.stringify(verts.items.products),
