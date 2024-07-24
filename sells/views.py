@@ -8,10 +8,12 @@ from django.views.generic import ListView
 from django.http import JsonResponse, HttpResponse
 #from weasyprint.text.fonts import FontConfiguration
 from django.template.loader import get_template
+from django.utils.timezone import now
+from django.db.models import Sum
 #from weasyprint import HTML, CSS
 from django.conf import settings
 import os
-from datetime import date
+from datetime import date, datetime
 
 
 # Create your views here.
@@ -24,10 +26,21 @@ def sells_view(request):
     if start_date and end_date:
         start_date = parse_date(start_date)
         end_date = parse_date(end_date)
-        sells = sells.filter(fecha_pedido__range=[start_date, end_date])
+    else:
+        today = date.today()
+        start_date = datetime.combine(today, datetime.min.time())
+        end_date = datetime.combine(today, datetime.max.time())
+    
+    sells = sells.filter(fecha_pedido__range=[start_date, end_date])
+    
+    # Calcular el total de ventas filtradas
+    total_ventas = sells.aggregate(Sum('total'))['total__sum'] or 0
+    
     context = {
-        'sells': sells
+        'sells': sells,
+        'total_ventas': total_ventas
     }
+    
     return render(request, 'sells.html', context)
 
 def clients_view(request):

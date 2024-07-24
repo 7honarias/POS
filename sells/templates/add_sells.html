@@ -289,17 +289,17 @@
             efectivo: 0.00
         },
         calculate: function () {
-            // Calcular subtotal 
-            calculatedtotal = 0;
+    // Calcular subtotal 
+            var calculatedtotal = 0;
 
             $.each(this.items.products, function (pos, dict) {
-
-                calculatedtotal = parseFloat(calculatedtotal) + parseFloat(dict.subtotal);
-
-
+                calculatedtotal += parseFloat(dict.subtotal);
             });
-            this.items.total = parseFloat(calculatedtotal)
-            document.getElementById("total").innerHTML = "Total {{moneda}}" + parseFloat(this.items.total).toFixed(0);
+
+            this.items.total = parseFloat(calculatedtotal);
+
+            // Actualizar el total formateado en pesos colombianos
+            document.getElementById("total").innerHTML = "Total: " + formatToCOP(this.items.total);
         },
 
         list: function () {
@@ -333,22 +333,20 @@
                         targets: [3],
                         class: "text-center",
                         render: function (data, type, row) {
-                            var buttons = `<input type="number" name="price" class="form-control text-center" value="${row.precio}">`;
-                            return buttons
+                            var precioFormateado = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(row.precio);
+                            return `<span>${precioFormateado}</span>`;
                         }
                     },
                     {
                         targets: [4],
                         class: "text-center",
                         render: function (data, type, row) {
-                            return "{{moneda}}" + parseFloat(data).toFixed(2)
+                            var subtotalFormateado = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(data);
+                            return `<span>${subtotalFormateado}</span>`;
                         }
                     },
                 ],
                 destroy: true,
-                "language": {
-                    "url": "{% static 'index/js/idiom.json' %}"
-                },
                 "lengthMenu": [[10, 25, 50], [10, 25, 50]],
                 rowCallback(row, data, displayNum, displayIndex, dataIndex) {
                     //console.log(data);
@@ -623,22 +621,7 @@ $('#btn_pay').on('click', function () {
             verts.list();
         })
         // Cambio de precio
-        .on('change', "input[name='price']", function () {
-            console.clear();
-            let precioE = parseFloat($(this).val());
-            if (isNaN(precioE)) {
-                precioE = 0;
-                //$(this).val(cant);
-            }
-            var tr = tableProducts.cell($(this).closest('td, li')).index();
-            //console.log(tr);
-            //var data = tableProducts.row(tr.row).data();
-            //console.log(data);
-            verts.items.products[tr.row].precio = precioE;
-            verts.items.products[tr.row].subtotal = parseFloat(verts.items.products[tr.row].cantidad) * parseFloat(precioE);
-            verts.calculate();
-            verts.list();
-        })
+        
     // Agregar desde lista 
     function addProductList(id_producto, name_producto, precio_producto) {
         producto = {
