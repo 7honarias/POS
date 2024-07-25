@@ -85,7 +85,7 @@
             </div>
             <div class="modal-body bg-dark text-white">
                 <p class="labelmodal">¿Estás seguro?</p>
-                <form method="POST" action="{% url 'DeleteCliente' %}">{% csrf_token %}
+                <form method="POST" action="{% url 'DeleteProduct' %}">{% csrf_token %}
                     <input type="hidden" id="id_personal_eliminar" name="id_personal_eliminar">
             </div>
             <div class="modal-footer bg-dark text-white">
@@ -144,6 +144,12 @@
                     </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-right"><strong>Total del Inventario:</strong></td>
+                        <td colspan="2">{{ total_inventory_cost|currency }}</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

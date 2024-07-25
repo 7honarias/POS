@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render, redirect
-from .models import Client, Product, Category, Egreso, ProductosEgreso
+from .models import Client, Product, Category, Sell, ProductosSell
 from .forms import AddClientForm, EditarClienteForm, AddProductForm, AddCategoryForm, EditarCategoryForm, EditarProductForm
 from django.contrib import messages
 from django.utils.dateparse import parse_date
@@ -21,7 +21,7 @@ def sells_view(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     
-    sells = Egreso.objects.all()
+    sells = Sell.objects.all()
     
     if start_date and end_date:
         start_date = parse_date(start_date)
@@ -84,10 +84,14 @@ def delete_client_view(request):
 
 def products_view(request):
     products = Product.objects.all()
+    total_inventory_cost = products.aggregate(total_cost=Sum('cost'))['total_cost']
+
+
     form_product = AddProductForm()
     form_editar = EditarProductForm()
     context = {
         'products': products,
+        'total_inventory_cost': total_inventory_cost,
         'form_product': form_product,
         'form_editar': form_editar,
     }
@@ -113,6 +117,12 @@ def add_product_view(request):
                 return redirect('products')
     return redirect('products')
 
+def delete_product_view(request):
+    if request.POST:
+        product = Product.objects.get(pk=request.POST.get('id_personal_eliminar'))
+        product.delete()
+    return redirect('products')
+
 
 def category_view(request):
     categories = Category.objects.all()
@@ -125,13 +135,12 @@ def category_view(request):
     }
     return render(request, 'categories.html', context)
 
-def details_sell_view(request, egreso_id):
-    products = ProductosEgreso.objects.filter(egreso__id=egreso_id)
-    egreso = Egreso.objects.get(pk=egreso_id)
-    print(egreso.__dict__)
+def details_sell_view(request, sell_id):
+    products = Product.objects.filter(sell__id=sell_id)
+    sell = Sell.objects.get(pk=sell_id)
     context = {
         'products': products,
-        'egreso': egreso,
+        'sell': sell,
     }
     return render(request, 'details_sell.html', context)
 
@@ -163,7 +172,7 @@ def edit_category_view(request):
 
 class add_ventas(ListView):
     template_name = 'add_sells.html'
-    model = Egreso
+    model = Sell
 
     def dispatch(self,request,*args,**kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -198,7 +207,7 @@ class add_ventas(ListView):
                 desglosar = False
 
                 client = Client.objects.get(id=id_cliente)
-                egreso = Egreso(
+                sell = Sell(
                     fecha_pedido=fecha,
                     cliente=client,
                     total=total,
@@ -209,12 +218,15 @@ class add_ventas(ListView):
                     ticket=ticket,
                     desglosar=desglosar
                 )
-                egreso.save()
+                sell.save()
                 
                 for product_data in products:
                     producto = Product.objects.get(id=product_data['id'])
+                    cantidad_vendida = product_data['cantidad']
+                    producto.quantity -= cantidad_vendida
+                    producto.save()
                     total = product_data
-                    product = ProductosEgreso(egreso=egreso, producto=producto, cantidad=product_data['cantidad'], entregado=True, precio=product_data['precio'], subtotal=product_data['subtotal'], iva=0, total=0)
+                    product = ProductosSell(sell=sell, producto=producto, cantidad=product_data['cantidad'], entregado=True, precio=product_data['precio'], subtotal=product_data['subtotal'], iva=0, total=0)
                     product.save()
                     print(product_data['cantidad'])
 
