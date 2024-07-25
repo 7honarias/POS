@@ -14,12 +14,17 @@ from django.db.models import Sum
 from django.conf import settings
 import os
 from datetime import date, datetime
+import pytz
+from django.utils.timezone import make_aware
+
 
 
 # Create your views here.
 def sells_view(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
+    bogota_tz = pytz.timezone('America/Bogota')
+
     
     sells = Sell.objects.all()
     
@@ -27,9 +32,11 @@ def sells_view(request):
         start_date = parse_date(start_date)
         end_date = parse_date(end_date)
     else:
-        today = date.today()
+        today = datetime.now(bogota_tz).date()
         start_date = datetime.combine(today, datetime.min.time())
         end_date = datetime.combine(today, datetime.max.time())
+        start_date = make_aware(start_date, bogota_tz)
+        end_date = make_aware(end_date, bogota_tz)
     
     sells = sells.filter(fecha_pedido__range=[start_date, end_date])
     
