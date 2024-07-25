@@ -543,6 +543,15 @@ $('#btn_pay').on('click', function () {
             //alert('{{last_id}}');
             return
         }
+        if (parseFloat(verts.items.pendiente) != 0){
+            Swal.fire({
+                icon: 'error',
+                title: '',
+                text: "agrega el pago",
+            });
+            //alert('{{last_id}}');
+            return
+        }
 
         let desglosar;
         const cb = document.querySelector('#desglosar');

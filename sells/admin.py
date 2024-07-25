@@ -1,5 +1,5 @@
 from django.contrib import admin
-from sells.models import Client, Product, Category, Proveedor, Egreso, Brand
+from sells.models import Client, Product, Category, Proveedor, Sell, Brand
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -43,7 +43,7 @@ class ProveedorAdmin(admin.ModelAdmin):
 admin.site.register(Proveedor, ProveedorAdmin)
 
 
-class EgresoAdmin(admin.ModelAdmin):
+class SellAdmin(admin.ModelAdmin):
     list_display = ('id','fecha_pedido', 'cliente', 'total')
     search_fields = ['id', 'fecha_pedido']
     readonly = ('created', 'updated')
@@ -51,7 +51,7 @@ class EgresoAdmin(admin.ModelAdmin):
     list_filter = ()
     fieldset = ()
 
-admin.site.register(Egreso, EgresoAdmin)
+admin.site.register(Sell, SellAdmin)
 
 
 class BrandAdmin(admin.ModelAdmin):

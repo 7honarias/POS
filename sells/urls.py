@@ -10,6 +10,7 @@ urlpatterns = [
     path('products', views.products_view, name='products'),
     path('add_product/', views.add_product_view, name='AddProduct'),
     path('edit_product/', views.edit_product_view, name='EditProduct'),
+    path('delete_product/', views.delete_product_view, name='DeleteProduct'),
     path('categories', views.category_view, name='categories'),
     path('add_category/', views.add_category_view, name='AddCategory'),
     path('edit_category/', views.edit_category_view, name='EditCategory'),
@@ -17,6 +18,6 @@ urlpatterns = [
     path('add_venta/',views.add_ventas.as_view(), name='AddVenta'),
     path('export/', views.export_pdf_view, name='ExportPDF'),
     path('export/<id>/<iva>', views.export_pdf_view, name="ExportPDF" ),
-    path('details_sell/<int:egreso_id>/', views.details_sell_view, name='Details'),
+    path('details_sell/<int:sell_id>/', views.details_sell_view, name='Details'),
 
 ]

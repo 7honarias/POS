@@ -94,7 +94,7 @@ class Proveedor(models.Model):
     def __str__(self):
         return self.name
     
-class Egreso(models.Model):
+class Sell(models.Model):
     fecha_pedido = models.DateField(max_length=255)
     cliente = models.ForeignKey(Client, on_delete=models.SET_NULL , null=True , related_name='client')
     total = models.DecimalField(max_digits=20, decimal_places=2, default=0)
@@ -108,16 +108,16 @@ class Egreso(models.Model):
     updated = models.DateTimeField(auto_now_add=True , null=True)
 
     class Meta:
-        verbose_name='egreso'
-        verbose_name_plural = 'egresos'
+        verbose_name='sell'
+        verbose_name_plural = 'sells'
         order_with_respect_to = 'fecha_pedido'
     
     def __str__(self):
         return str(self.id)
    
 
-class ProductosEgreso(models.Model):
-    egreso = models.ForeignKey(Egreso, on_delete=models.CASCADE)
+class ProductosSell(models.Model):
+    sell = models.ForeignKey(Sell, on_delete=models.CASCADE)
     producto = models.ForeignKey(Product, on_delete=models.CASCADE)
     cantidad = models.DecimalField(max_digits=20, decimal_places=2 , null=False)
     precio = models.DecimalField(max_digits=20, decimal_places=2 , null=False , default=0)
@@ -129,8 +129,8 @@ class ProductosEgreso(models.Model):
     devolucion = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name='producto egreso'
-        verbose_name_plural = 'productos egreso'
+        verbose_name='producto sell'
+        verbose_name_plural = 'productos sell'
         order_with_respect_to = 'created'
     
     def __str__(self):
