@@ -63,7 +63,6 @@ def clients_view(request):
 
 
 def add_client_view(request):
-    print("guardar cliente")
     if request.POST:
         form = AddClientForm(request.POST, request.FILES)
         if form.is_valid():
@@ -73,6 +72,17 @@ def add_client_view(request):
                 messages(request, "Error al guardar")
                 return redirect('clients')
     return redirect('clients')
+
+def add_client_sell_view(request):
+    if request.POST:
+        form = AddClientForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.save()
+            except:
+                messages(request, "Error al guardar")
+                return redirect('AddVenta')
+    return redirect('AddVenta')
 
 
 def edit_client_view(request):
@@ -183,12 +193,7 @@ class add_ventas(ListView):
 
     def dispatch(self,request,*args,**kwargs):
         return super().dispatch(request, *args, **kwargs)
-    """
-    def get_queryset(self):
-        return ProductosPreventivo.objects.filter(
-            preventivo=self.kwargs['id']
-        )
-    """
+
     def post(self, request,*ars, **kwargs):
         data = {}
         try:
@@ -251,6 +256,7 @@ class add_ventas(ListView):
         context['productos_lista'] = Product.objects.all()
         context['clientes_lista'] = Client.objects.all()
         context['HOY'] = hoy;
+        context['form_client'] = AddClientForm
         return context
 
 

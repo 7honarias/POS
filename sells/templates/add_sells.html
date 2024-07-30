@@ -8,6 +8,37 @@
 
 {% block content %}
 
+<div id="AgregarClienteModal" class="modal" style="overflow: scroll;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title text-dark">Agregar nuevo</h5>
+            </div>
+            <div class="modal-body bg-dark text-white">
+                <form method="POST" action="{% url 'AddClienteSell' %}" enctype="multipart/form-data">{% csrf_token %}
+                    {% for field in form_client %}
+                    <p>{{field.label}} <br>
+                        {{field|add_class:"form-control text-dark"}}</p>
+                    {% for error in field.errors %}
+                    <p class="alarma">{{error}}</p>
+                    {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <p class="alarma">{{error}}</p>
+                    {% endfor %}
+            </div>
+            <div class="modal-footer bg-dark">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                    Agregar
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div id="MaterialesModal" class="modal bd-example-modal-lg" style="overflow: scroll;">
     <div class="modal-dialog modal-lg">
@@ -210,6 +241,11 @@
             <div class="input-group-append">
                 <a class="btn btn-primary" href="#ClientesModal" data-toggle="modal" data-dismiss="modal">
                     <i class="fas fa-user-edit"></i>
+                </a>
+            </div>
+            <div class="input-group-append">
+                <a class="btn btn-primary" href="#AgregarClienteModal" data-toggle="modal" data-dismiss="modal">
+                    <i class="fas fa-user-plus"></i>
                 </a>
             </div>
         </div>

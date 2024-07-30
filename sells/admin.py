@@ -17,7 +17,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name']
     readonly = ('created', 'updated')
     filter_horizontal = ()
-    list_filter = ()
+    list_filter = ['quantity',]
     fieldset = ()
 
 admin.site.register(Product, ProductAdmin)
