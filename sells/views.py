@@ -250,12 +250,13 @@ class add_ventas(ListView):
         return JsonResponse(data,safe=False)
     
     def get_context_data(self, **kwargs):
-        hoy = date.today().strftime('%Y-%m-%d')
+        bogota_tz = pytz.timezone('America/Bogota')
+        today = datetime.now(bogota_tz).date().strftime('%Y-%m-%d')
 
         context = super().get_context_data(**kwargs)
         context['productos_lista'] = Product.objects.all()
         context['clientes_lista'] = Client.objects.all()
-        context['HOY'] = hoy;
+        context['HOY'] = today;
         context['form_client'] = AddClientForm
         return context
 
