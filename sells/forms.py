@@ -6,9 +6,9 @@ class AddClientForm(forms.ModelForm):
         model = Client
         fields = ('code', 'name', 'phone')
         labels = {
-            'code': 'code',
-            'name': 'name',
-            'phone': 'phone',
+            'code': 'Cedula',
+            'name': 'Nombre',
+            'phone': 'Telefono',
         }
 
 
@@ -17,7 +17,7 @@ class EditarClienteForm(forms.ModelForm):
         model = Client
         fields = ('code', 'name', 'phone')
         labels = {
-            'code': 'Código',
+            'code': 'Cedula',
             'name': 'Nombre',
             'phone': 'Teléfono',
         }
