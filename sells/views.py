@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponse
 #from weasyprint.text.fonts import FontConfiguration
 from django.template.loader import get_template
 from django.utils.timezone import now
-from django.db.models import Sum
+from django.db.models import Sum, F
 #from weasyprint import HTML, CSS
 from django.conf import settings
 import os
@@ -101,8 +101,9 @@ def delete_client_view(request):
 
 def products_view(request):
     products = Product.objects.all()
-    total_inventory_cost = products.aggregate(total_cost=Sum('cost'))['total_cost']
-
+    total_inventory_cost = Product.objects.aggregate(
+    total_cost=Sum(F('cost') * F('quantity'))
+    )['total_cost']
 
     form_product = AddProductForm()
     form_editar = EditarProductForm()
