@@ -68,10 +68,10 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'product'
         verbose_name_plural = 'products'
-        order_with_respect_to = 'description'
+        order_with_respect_to = 'name'
 
     def __str__(self):
-        return self.description
+        return self.name
     
     def toJSON(self):
         item = model_to_dict(self, exclude=['created', 'image'])
