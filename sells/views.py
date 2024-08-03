@@ -154,7 +154,7 @@ def category_view(request):
     return render(request, 'categories.html', context)
 
 def details_sell_view(request, sell_id):
-    products = Product.objects.filter(sell__id=sell_id)
+    products = ProductosSell.objects.filter(sell__id=sell_id)
     sell = Sell.objects.get(pk=sell_id)
     context = {
         'products': products,
