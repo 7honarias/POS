@@ -1,5 +1,5 @@
 from django.contrib import admin
-from sells.models import Client, Product, Category, Proveedor, Sell, Brand
+from sells.models import Client, Product, Category, Proveedor, Sell, Brand, Pet, Grommer, Service
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -63,3 +63,34 @@ class BrandAdmin(admin.ModelAdmin):
     fieldset = ()
 
 admin.site.register(Brand, BrandAdmin)
+
+
+class PetAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    search_fields = ['id', 'name']
+    readonly = ('created', 'updated')
+    filter_horizontal = ()
+    list_filter = ()
+    fieldset = ()
+
+admin.site.register(Pet, PetAdmin)
+
+class GrommerAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    search_fields = ['id', 'name']
+    readonly = ('created', 'updated')
+    filter_horizontal = ()
+    list_filter = ()
+    fieldset = ()
+
+admin.site.register(Grommer, GrommerAdmin)
+
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('id','name')
+    search_fields = ['id', 'name']
+    readonly = ('created', 'updated')
+    filter_horizontal = ()
+    list_filter = ()
+    fieldset = ()
+
+admin.site.register(Service, ServiceAdmin)

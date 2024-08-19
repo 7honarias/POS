@@ -1,5 +1,5 @@
 from django import forms
-from sells.models import Client, Product, Category
+from sells.models import Client, Product, Category, Pet, Service
 
 class AddClientForm(forms.ModelForm):
     class Meta:
@@ -11,6 +11,33 @@ class AddClientForm(forms.ModelForm):
             'phone': 'Telefono',
         }
 
+class AddPetForm(forms.ModelForm):
+    class Meta:
+        model = Pet
+        fields = ('name', 'age', 'raza', 'recomendation', 'sick')
+        labels = {
+            'name': 'Nombre',
+            'age': 'Edad',
+            'raza': 'raza',
+            'recomendation': 'recomendacion',
+            'sick': 'enfermedad'
+        }
+
+class EditarServiceForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = ('code', 'name', 'status')
+        labels = {
+            'code': 'code',
+            'name': 'Nombre',
+            'status': 'status'
+        }
+    
+        widgets = {
+            'code': forms.TextInput(attrs={'type': 'text', 'id': 'code_editar'}),
+            'name': forms.TextInput(attrs={'id': 'nombre_editar'}),
+            'status': forms.TextInput(attrs={'id': 'status_editar'}),
+        }
 
 class EditarClienteForm(forms.ModelForm):
     class Meta:
