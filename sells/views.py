@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect
-from .models import Client, Product, Category, Sell, ProductosSell
-from .forms import AddClientForm, EditarClienteForm, AddProductForm, AddCategoryForm, EditarCategoryForm, EditarProductForm
+from .models import Client, Product, Category, Sell, ProductosSell, Service, Pet, Grommer
+from .forms import AddClientForm, EditarClienteForm, EditarServiceForm, AddProductForm, AddCategoryForm, EditarCategoryForm, EditarProductForm, AddPetForm
 from django.contrib import messages
 from django.utils.dateparse import parse_date
 from django.views.generic import ListView
@@ -49,6 +49,44 @@ def sells_view(request):
     }
     
     return render(request, 'sells.html', context)
+
+def service_view(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    bogota_tz = pytz.timezone('America/Bogota')
+    
+    services = Service.objects.all()
+    
+    if start_date and end_date:
+        start_date = parse_date(start_date)
+        end_date = parse_date(end_date)
+    else:
+        today = datetime.now(bogota_tz).date()
+        start_date = datetime.combine(today, datetime.min.time())
+        end_date = datetime.combine(today, datetime.max.time())
+        start_date = make_aware(start_date, bogota_tz)
+        end_date = make_aware(end_date, bogota_tz)
+    
+    services = services.filter(created__range=[start_date, end_date])
+    
+    # Calcular el total de ventas filtradas
+    total_ventas = Service.objects.aggregate(Sum('total'))['total__sum'] or 0
+    form_editar = EditarServiceForm()
+    context = {
+        'services': services,
+        'total_ventas': total_ventas,
+        'editar_from': form_editar
+    }
+    
+    return render(request, 'services.html', context)
+
+def edit_service_view(request):
+    service = Service.objects.get(pk=request.POST.get('id_personal_editar'))
+    form = EditarServiceForm(request.POST, request.FILES, instance=service)
+    if form.is_valid():
+        form.save()
+    return redirect('services')
+
 
 def clients_view(request):
     clients = Client.objects.all()
@@ -124,7 +162,6 @@ def edit_product_view(request):
     return redirect('products')
 
 def add_product_view(request):
-    print("guardar product")
     if request.POST:
         form = AddProductForm(request.POST, request.FILES)
         if form.is_valid():
@@ -163,7 +200,6 @@ def details_sell_view(request, sell_id):
     return render(request, 'details_sell.html', context)
 
 def add_category_view(request):
-    print("guardar categoria")
     if request.POST:
         form = AddCategoryForm(request.POST, request.FILES)
         if form.is_valid():
@@ -188,6 +224,108 @@ def edit_category_view(request):
         form.save()
     return redirect('categories')
 
+class add_service(ListView):
+    template_name = 'add_service.html'
+    model = Service
+
+    def dispatch(self,request,*args,**kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request,*ars, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'autocomplete':
+                result = []
+                for i in Client.objects.filter(code__icontains=request.POST["term"])[0:10]:
+                    item = i.toJSON()
+                    item['value'] = i.code
+                    result.append(item)
+                data['result'] = result
+            
+            if action == 'grommer':
+                grommer = Grommer.objects.all()
+                grommers = list(grommer.values('id', 'name'))
+
+                data['grommers'] = grommers
+            if action == 'pets':
+                client = Client.objects.get(id=request.POST["id_cliente"])
+
+                pets = Pet.objects.filter(tutor=client).values()
+                pets = list(pets)
+
+                data['pets'] = pets
+
+            elif action == 'save':
+                fecha = request.POST['fecha']
+                id_cliente = request.POST['id_cliente']
+                comentarios = request.POST['comentarios']
+                total = request.POST['total']
+                grommerId = request.POST['grommer_id']
+                petId = request.POST['pet_id']
+                service = request.POST['service_id']
+                ticket = True
+
+                desglosar = False
+                client = Client.objects.get(id = id_cliente)
+                grommer = Grommer.objects.get(id=grommerId)
+                pet = Pet.objects.get(id=petId)
+                service = Service(
+                    cliente = client,
+                    total = total,
+                    price = total,
+                    grommer = grommer,
+                    name = service,
+                    code = service,
+                    comment = comentarios,
+                    pet = pet,
+                    status = "pendiente"
+                )
+                service.save()
+
+
+            if action == 'savePet':
+                
+                name = request.POST['name']
+                specie = request.POST['specie']
+                age = request.POST['age']
+                raza = request.POST['breed']
+                id_cliente = request.POST['id_cliente']
+                recomendation = request.POST['recomendation']
+                sick = request.POST['sick']
+                client = Client.objects.get(id=id_cliente)
+                pet = Pet(
+                    tutor = client,
+                    name = name,
+                    specie = specie,
+                    age = age,
+                    raza = raza,
+                    recomendation = recomendation,
+                    sick = sick
+                )
+                pet.save()
+                data['clientId'] = client.code
+            
+            else:
+                data['error'] = "Ha ocurrido un error"
+        except Exception as e:
+            data['error'] = str(e)
+
+        return JsonResponse(data,safe=False)
+
+
+
+    def get_context_data(self, **kwargs):
+        bogota_tz = pytz.timezone('America/Bogota')
+        today = datetime.now(bogota_tz).date().strftime('%Y-%m-%d')
+
+        context = super().get_context_data(**kwargs)
+        context['clientes_lista'] = Client.objects.all()
+        context['HOY'] = today;
+        context['form_client'] = AddClientForm
+        context['form_pet'] = AddPetForm
+        return context
+    
 class add_ventas(ListView):
     template_name = 'add_sells.html'
     model = Sell
@@ -202,7 +340,6 @@ class add_ventas(ListView):
             if action == 'autocomplete':
                 data = []
                 for i in Product.objects.filter(code__icontains=request.POST["term"])[0:10]:
-                    print(i)
                     item = i.toJSON()
                     item['value'] = i.code
                     data.append(item)
@@ -241,7 +378,6 @@ class add_ventas(ListView):
                     total = product_data
                     product = ProductosSell(sell=sell, producto=producto, cantidad=product_data['cantidad'], entregado=True, precio=product_data['precio'], subtotal=product_data['subtotal'], iva=0, total=0)
                     product.save()
-                    print(product_data['cantidad'])
 
             else:
                 data['error'] = "Ha ocurrido un error"
@@ -260,6 +396,7 @@ class add_ventas(ListView):
         context['HOY'] = today;
         context['form_client'] = AddClientForm
         return context
+
 
 
 def export_pdf_view(request, id, iva):

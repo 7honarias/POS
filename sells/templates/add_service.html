@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load custom_filters %}
+
+
+{% block content %}
+
+<div id="AgregarClienteModal" class="modal" style="overflow: scroll;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h5 class="modal-title text-dark">Agregar nuevo</h5>
+            </div>
+            <div class="modal-body bg-dark text-white">
+                <form method="POST" action="{% url 'AddService' %}" enctype="multipart/form-data">{% csrf_token %}
+                    {% for field in form_client %}
+                    <p>{{field.label}} <br>
+                        {{field|add_class:"form-control text-dark"}}</p>
+                    {% for error in field.errors %}
+                    <p class="alarma">{{error}}</p>
+                    {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <p class="alarma">{{error}}</p>
+                    {% endfor %}
+            </div>
+            <div class="modal-footer bg-dark">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                    Agregar
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="AddPetModel" class="modal bd-example-modal-lg">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h3 class="modal-title text-dark">Nueva Mascota</h3>
+            </div>
+            <div class="modal-body" style="overflow:scroll; max-height: 450px;">
+                <form id="addPetForm">
+                    <div class="form-group">
+                        <label for="petName">Nombre</label>
+                        <input type="text" class="form-control" id="petName" placeholder="Ingrese el nombre de la mascota">
+                    </div>
+                    <div class="form-group">
+                        <label for="petName">Especie</label>
+                        <input type="text" class="form-control" id="petSpecie" placeholder="Ingrese la especie de la mascota">
+                    </div>
+                    <div class="form-group">
+                        <label for="petAge">Edad</label>
+                        <input type="number" class="form-control" id="petAge" placeholder="Ingrese la edad de la mascota">
+                    </div>
+                    <div class="form-group">
+                        <label for="petBreed">Raza</label>
+                        <input type="text" class="form-control" id="petBreed" placeholder="Ingrese la raza de la mascota">
+                    </div>
+                    <div class="form-group">
+                        <label for="petRecommendation">Recomendación</label>
+                        <input type="text" class="form-control" id="petRecommendation" placeholder="Ingrese alguna recomendación">
+                    </div>
+                    <div class="form-group">
+                        <label for="petSick">Enfermedad</label>
+                        <input type="text" class="form-control" id="petSick" placeholder="Ingrese alguna enfermedad">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-dark">
+                <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">
+                    Cerrar
+                    <i class="fas fa-window-close"></i>
+                </button>
+                <button onclick="savePet()" id="btnNewPet" class="btn btn-success btn-lg">Agregar Mascota<i class="fas"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-4">
+        <div class="input-group">
+            <div class="input-group-append pr-1">
+                <h6>Impresión: </h6>
+            </div>
+            <select required name="impresion" class="form-control border border-dark bg-secondary text-white"
+                id="impresion">
+                <option value="1" selected>Ticket</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            <div class="input-group-append pr-1">
+                <h6>Fecha: </h6>
+            </div>
+            <input required type="date" class="form-control border border-dark bg-secondary text-white" name="fecha"
+                id="fecha" value="{{HOY}}">
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="input-group" id="div-cliente">
+            <div class="input-group-append pr-1">
+                <h6>Cliente: </h6><input type="text" name="search" id="search" placeholder="Ingrese cedula">
+            </div>
+            <div class="input-group-append">
+                <a class="btn btn-primary" href="#AgregarClienteModal" data-toggle="modal" data-dismiss="modal">
+                    <i class="fas fa-user-plus"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="form-group">
+            <label for="clientCode">ID:</label>
+            <input type="text" id="clientId" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+            <label for="clientCode">Cedula Cliente:</label>
+            <input type="text" id="clientCode" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+            <label for="clientName">Nombre Cliente:</label>
+            <input type="text" id="clientName" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+            <label for="clientPhone">Teléfono Cliente:</label>
+            <input type="text" id="clientPhone" class="form-control" readonly>
+        </div>
+    </div>
+</div>
+<div class="row text-center mt-4">
+    <div class="col-12">
+        <button data-toggle="modal" href="#AddPetModel" id="btn_add_pet" class="btn btn-success btn-block">Agregar Mascota <i
+                class="fas"></i></button>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div id="petList">
+        </div>
+    </div>
+</div>
+<div class="modal-body" style="overflow:scroll; max-height: 450px;">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>valor {{moneda}}</th>
+            </tr>
+        </thead>
+        <tbody class="text-dark">
+            <tr>
+                <td>
+                    <select id="service_selected" class="form-control">
+                        <option value="" selected disabled>Selecciona un servicio</option>
+                        <option value="shower">Baño</option>
+                        <option value="hair">Peinada</option>
+                        <option value="nails">Uñas</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control" id="valor">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-12">
+            <select id="grommerSelect" class="form-control">
+                <option value="" selected disabled>Seleccione un groomer</option>
+                <!-- Opciones aquí -->
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <p>
+            <label for="comentarios" class="form-control">Comentarios: </label>
+            <textarea class="form-control border border-dark bg-secondary text-white" id="comentarios"
+                name="comentarios" rows="2" cols="6"></textarea>
+        </p>
+    </div>
+</div>
+
+<div class="row text-center mt-4">
+    <div class="col-12">
+        <button id="btn_pay" class="btn btn-success btn-block">Agregar Venta <i
+                class="fas fa-money-bill"></i></button>
+    </div>
+</div>
+
+<script>
+    var tableProducts;
+    // Verts variable
+    var verts = {
+        items: {
+            total: 0.00,
+            products: [],
+            pagado: 0.00,
+            pendiente: 0.00,
+            cambio: 0.00,
+            transferencia: 0.00,
+            tarjeta: 0.00,
+            efectivo: 0.00
+        },
+    };
+
+
+function agregarPago() {
+    var metodo = document.getElementById("metodo_pago").value;
+    var monto = parseFloat(document.getElementById("monto_pago").value.replace(/[^0-9.-]+/g, "")) || 0;
+
+    if (metodo && monto > 0) {
+        if (metodo === "efectivo") {
+            verts.items.efectivo += monto;
+        } else if (metodo === "tarjeta") {
+            verts.items.tarjeta += monto;
+        } else if (metodo === "transferencia") {
+            verts.items.transferencia += monto;
+        }
+
+        var pagosTable = document.getElementById("pagos_body");
+        var newRow = pagosTable.insertRow();
+        
+        var cellMetodo = newRow.insertCell(0);
+        var cellMonto = newRow.insertCell(1);
+        var cellAccion = newRow.insertCell(2);
+        
+        cellMetodo.innerHTML = metodo.charAt(0).toUpperCase() + metodo.slice(1);
+        cellMonto.innerHTML = formatToCOP(monto);
+        
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "btn btn-danger btn-sm";
+        deleteButton.onclick = function() {
+            eliminarPago(newRow, metodo, monto);
+        };
+        cellAccion.appendChild(deleteButton);
+
+        actualizarValores();
+
+        document.getElementById("metodo_pago").value = "";
+        document.getElementById("monto_pago").value = "";
+    } else {
+        alert("Por favor selecciona un método de pago y especifica un monto válido.");
+    }
+}
+
+function eliminarPago(row, metodo, monto) {
+    row.parentNode.removeChild(row);
+
+    if (metodo === "efectivo") {
+        verts.items.efectivo -= monto;
+    } else if (metodo === "tarjeta") {
+        verts.items.tarjeta -= monto;
+    } else if (metodo === "transferencia") {
+        verts.items.transferencia -= monto;
+    }
+
+    actualizarValores();
+}
+
+function actualizarValores() {
+    verts.items.pagado = verts.items.efectivo + verts.items.tarjeta + verts.items.transferencia;
+    verts.items.pendiente = verts.items.total - verts.items.pagado;
+
+    if (verts.items.pendiente < 0) {
+        verts.items.pendiente = 0;
+    }
+
+    if (verts.items.pagado > verts.items.total) {
+        verts.items.cambio = verts.items.pagado - verts.items.total;
+    } else {
+        verts.items.cambio = 0;
+    }
+
+    if (verts.items.pagado > verts.items.total) {
+        document.getElementById('btn_add_pay').disabled = true;
+    } else {
+        document.getElementById('btn_add_pay').disabled = false;
+    }
+
+    document.getElementById("pagado").value = formatToCOP(verts.items.pagado);
+    document.getElementById("pendiente").value = formatToCOP(verts.items.pendiente);
+    document.getElementById("cambio").value = formatToCOP(verts.items.cambio);
+    document.getElementById("monto_to_pay").value = formatToCOP(verts.items.total);
+}
+
+document.getElementById('search').addEventListener('input', function() {
+    const clientId = this.value;
+});
+
+function loadGrommers() {
+    $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                'action': 'grommer',
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            if (data['grommers']) {
+        const grommers = data['grommers'];
+        const selectElement = document.getElementById('grommerSelect');
+        
+        selectElement.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Seleccionar grommer';
+        selectElement.appendChild(defaultOption);
+        grommers.forEach((grommer) => {
+            const option = document.createElement('option');
+            option.value = grommer['id'];  // Usa el campo id
+            option.textContent = grommer['name'];  // Usa el campo name
+            selectElement.appendChild(option);
+        });
+    } else {
+        console.error('No se encontraron datos de grommers:', data);
+    }
+        }).fail(
+            function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: textStatus,
+                    footer: errorThrown
+                })
+        }).always(
+            function (data) {
+        });
+
+}
+
+function loadPets(clientId) {
+    const petList = document.getElementById('petList');
+    petList.innerHTML = ''; 
+    $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                'action': 'pets',
+                'id_cliente': clientId,
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            pets = data['pets']
+
+            pets.forEach((pet, index) => {
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.id = `pet_${index}`;
+                radioInput.name = 'pet';
+                radioInput.value = pet['id'];
+                radioInput.className = 'mr-2';
+
+                const label = document.createElement('label');
+                label.htmlFor = `pet_${index}`;
+                label.innerText = pet['name'];
+                label.className = 'mr-3';
+
+                // Agregar radio button y label al contenedor
+                petList.appendChild(radioInput);
+                petList.appendChild(label);
+            });
+            if (data[1] == true){
+                window.open("{% url 'ExportPDF' %}" + data[0] + "/" + data[2], '_blank');
+            }
+            //window.open("{% url 'ExportPDF' %}" + data[0], '_blank');
+            //location.reload();
+        }).fail(
+            function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: textStatus,
+                    footer: errorThrown
+                })
+        }).always(
+            function (data) {
+        });
+}
+
+function formatToCOP(value) {
+    return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP' });
+}
+
+function getSelectedPet() {
+    const selectedRadio = document.querySelector('input[name="pet"]:checked');
+    return selectedRadio ? selectedRadio.value : null;
+}
+
+$('#btn_pay').on('click', function () {
+    selectPet = getSelectedPet()
+    verts.items.total = Number(document.getElementById("valor").value);
+    var grommer = document.getElementById("grommerSelect").value;
+    var servico = document.getElementById("service_selected").value;
+
+    if(!selectPet || verts.items.total <= 0 || grommer == '' || servico == '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'oops',
+            text: "verifica que todos los campos esten llenos",
+        });
+        return
+    }
+
+    saveData();
+});
+
+
+    // Autocomplete
+$(function () {
+    var selectingFirstItem = false;
+
+    $("#search").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: window.location.pathname,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'action': 'autocomplete',
+                    'term': request.term,
+                },
+                dataType: 'json',
+            }).done(function (data) {
+                response(data.result);
+                if (selectingFirstItem) {
+                    selectFirstAutocompleteItem();
+                    selectingFirstItem = false; // Reiniciar la bandera después de seleccionar el primer ítem
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: textStatus,
+                    footer: errorThrown
+                });
+            }).always(function (data) {
+            });
+        },
+        minLength: 2,
+        select: function (event, ui) {
+            event.preventDefault();
+            item = ui.item
+            document.getElementById('clientId').value = item.id;
+            document.getElementById('clientCode').value = item.code;
+            document.getElementById('clientName').value = item.name;
+            document.getElementById('clientPhone').value = item.phone;
+            loadPets(item.id);
+            loadGrommers();
+            $(this).val('');
+        }
+    });
+
+    $("#search").keydown(function (event) {
+        if (event.key === "Enter") {
+            if ($("#search").autocomplete("widget").is(":visible")) {
+                selectFirstAutocompleteItem();
+                event.preventDefault();
+            } else {
+                selectingFirstItem = true;
+            }
+        }
+    });
+
+    function selectFirstAutocompleteItem() {
+        var autocomplete = $("#search").autocomplete("widget");
+        var firstItem = autocomplete.children("li.ui-menu-item").first();
+        if (firstItem.length > 0) {
+            firstItem.click();
+        }
+    }
+});
+
+function savePet() {
+    const name = document.getElementById('petName').value;
+    const age = document.getElementById('petAge').value;
+    const breed = document.getElementById('petBreed').value;
+    const recommendation = document.getElementById('petRecommendation').value;
+    const sick = document.getElementById('petSick').value;
+    const clientId = document.getElementById('clientId').value;
+    const specie = document.getElementById('petSpecie').value;
+
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            'action': 'savePet',
+            'fecha': document.getElementById("fecha").value,
+            'id_cliente': clientId,
+            'name': name,
+            'specie': specie,
+            'age': age,
+            'breed': breed,
+            'recomendation': recommendation,
+            'sick': sick
+        },
+        dataType: 'json',
+    }).done(function (data) {
+        document.getElementById('search').value = data['clientId'];
+        
+        $("#AddPetModel").modal('hide');
+        
+    }).fail(
+        function (jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: textStatus,
+                footer: errorThrown
+            })
+    }).always(
+        function (data) {
+    });
+}
+
+function saveData() {
+    console.log(getSelectedPet());
+    if (parseFloat(verts.items.total) == 0) {
+        Swal.fire({
+            icon: 'error',
+            title: '',
+            text: "No hay ningún producto agregado a la lista",
+        });
+        return
+    }
+
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            'action': 'save',
+            'fecha': document.getElementById("fecha").value,
+            'id_cliente': document.getElementById("clientId").value,
+            'comentarios': document.getElementById("comentarios").value,
+            'ticket': document.getElementById("impresion").value,
+            'grommer_id' : document.getElementById("grommerSelect").value,
+            'total': verts.items.total,
+            'service_id': document.getElementById("service_selected").value,
+            'pet_id': getSelectedPet()
+        },
+        dataType: 'json',
+    }).done(function (data) {
+        location.reload();
+
+        if (data[1] == true){
+            window.open("{% url 'ExportPDF' %}" + data[0] + "/" + data[2], '_blank');
+        }
+    }).fail(
+        function (jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: textStatus,
+                footer: errorThrown
+            })
+        }).always(
+            function (data) {
+            });
+}
+</script>
+
+{% if messages %}
+{% for message in messages %}
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Confirmación',
+        text: "{{message}}",
+        footer: ""
+    })
+</script>
+{% endfor %}
+{% endif %}
+
+{% endblock %}

@@ -117,12 +117,15 @@
             <table class="table table-hover table-primary" id="myTable">
                 <thead>
                     <tr>
-                        <th># ID</th>
-                        <th>Código</th>
+                        <th>ID</th>
+                        <th>Codigo</th>
+                        <th>marca</th>
                         <th>Nombre</th>
+                        <th>Min</th>
+                        <th>Costo</th>
+                        <th>Margin</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
-                        <th>Opciones</th>
                     </tr>
                 </thead>
                 <tbody class="text-dark">
@@ -130,17 +133,13 @@
                     <tr>
                         <td>{{i.id}}</td>
                         <td>{{i.code}}</td>
+                        <td>{{i.brand}}</td>
                         <td>{{i.name}}</td>
+                        <td>{{i.minimunStock}}</td>
+                        <td>{{i.cost}}</td>
+                        <td>{{i.margin}}</td>
                         <td>{{i.quantity}}</td>
                         <td>{{i.price|currency}}</td>
-                        <td>
-                            <button onclick="editarProduct('{{i.id}}', '{{i.price}}', '{{i.cost}}', '{{i.quantity}}',)" class="btn btn-dark-outline btn-sm" data-toggle="modal"
-                                href="#EditarPersonalModal"><img src="{% static 'index/img/editar.png' %}" alt="Error"
-                                    width="30"></button>
-                            <button onclick="eliminarPersonal('{{i.id}}')" class="btn btn-dark-outline btn-sm"
-                                data-toggle="modal" href="#EliminarPersonalModal"><img
-                                    src="{% static 'index/img/delete.png' %}" alt="Error" width="30"></button>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

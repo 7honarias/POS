@@ -17,6 +17,10 @@ class Client(models.Model):
     def __str__(self):
         return self.name
     
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['created', 'updated'])
+        return item
+    
 class Category(models.Model):
     name = models.CharField(max_length=225, null=True, blank=False)
     description = models.CharField(max_length=255, null=False)
@@ -96,7 +100,7 @@ class Proveedor(models.Model):
     
 class Sell(models.Model):
     fecha_pedido = models.DateField(max_length=255)
-    cliente = models.ForeignKey(Client, on_delete=models.SET_NULL , null=True , related_name='client')
+    cliente = models.ForeignKey(Client, on_delete=models.SET_NULL , null=True , related_name='sells')
     total = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     efectivo = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     tarjeta = models.DecimalField(max_digits=20, decimal_places=2, default=0)
@@ -140,4 +144,78 @@ class ProductosSell(models.Model):
         item = model_to_dict(self, exclude=['created'])
         return item
 
+class Grommer(models.Model):
+    name = models.CharField(max_length=200, null=True, blank=False)
+    cedula = models.DecimalField(max_digits=13, decimal_places=0, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'grommer'
+        verbose_name_plural = 'grommers'
     
+    def __str__(self):
+        return self.name
+    
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['created'])
+        return item
+    
+
+
+
+class Aditional(models.Model):
+    name = models.CharField(max_length=200, null=True, blank=False)
+    price = models.DecimalField(max_digits=13, decimal_places=0, null=True)
+    total = models.DecimalField(max_digits=20, decimal_places=2, default=0)  
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'adition'
+        verbose_name_plural = 'Aditions'
+    
+    def __str__(self):
+        return self.name
+
+
+class Pet(models.Model):
+    tutor = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True , related_name='pets')
+    specie = models.CharField(max_length=200, null=True, blank=False)
+    name = models.CharField(max_length=200, null=True, blank=False)
+    age = models.DecimalField(max_digits=2, decimal_places=0 , null=False)
+    raza = models.CharField(max_length=200, null=True, blank=False)
+    recomendation = models.CharField(max_length=200, null=True, blank=False)
+    sick =  models.CharField(max_length=200, null=True, blank=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name='pet'
+        verbose_name_plural = 'pets'
+    
+    def __str__(self):
+        return self.name
+    
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['created', 'updated'])
+        return item
+    
+class Service(models.Model):
+    code = models.CharField(max_length=200, null=True, blank=False)
+    name = models.CharField(max_length=200, null=True, blank=False)
+    pet = models.ForeignKey(Pet, on_delete=models.SET_NULL , null=True , related_name='pets')
+    comments = models.CharField(max_length=200, null=True, blank=False)
+    cliente = models.ForeignKey(Client, on_delete=models.SET_NULL , null=True , related_name='services')
+    grommer = models.ForeignKey(Grommer, on_delete=models.SET_NULL , null=True , related_name='grommers')
+    price = models.DecimalField(max_digits=13, decimal_places=0, null=True)
+    total = models.DecimalField(max_digits=20, decimal_places=2, default=0)  
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=200, null=True, blank=False)
+
+    class Meta:
+        verbose_name = 'service'
+        verbose_name_plural = 'services'
+    
+    def __str__(self):
+        return self.name

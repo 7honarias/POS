@@ -41,15 +41,12 @@ function historialPreventivo(id,solicitadoh,supervisado,responsable, subtotalpie
   document.getElementById("hist_fecha_programada_editar").value = fecha;
 }
 
-function editarPreventivo(id, fecha, contacto, piezas, actividades, comentarios, total) {
-  
-  document.getElementById("id_preventivo_editar").value = id;
-  document.getElementById("fecha_editar").value = fecha;
-  document.getElementById("contacto_editar").value = contacto;
-  document.getElementById("actividades_editar").value = actividades;
-  document.getElementById("comentarios_editar").value = comentarios;
-  document.getElementById("piezas_editar").value = piezas;
-  document.getElementById("total_editar").value = total;
+function editarPreventivo(id, code, name, status) {
+  console.log(status);
+  document.getElementById("id_personal_editar").value = id;
+  document.getElementById("nombre_editar").value = name;
+  document.getElementById("status_editar").value = status;
+  document.getElementById("code_editar").value = code;
 }
 
 function editarCorrectivo(id, equipo, fecha, solicitado, estado, responsable, actividades, subtotalmo, supervisado, falla) {
@@ -93,6 +90,13 @@ function editarPersonal(id, code, name, phone) {
   document.getElementById("id_personal_editar").value = id;
   document.getElementById("nombre_editar").value = name;
   document.getElementById("telefono_editar").value = phone;
+  document.getElementById("code_editar").value = code;
+}
+
+function editarService(id, code, name, status) {
+  document.getElementById("id_personal_editar").value = id;
+  document.getElementById("nombre_editar").value = name;
+  document.getElementById("status_editar").value = status;
   document.getElementById("code_editar").value = code;
 }
 
