@@ -122,6 +122,17 @@ def add_client_sell_view(request):
                 return redirect('AddVenta')
     return redirect('AddVenta')
 
+def add_client_service_view(request):
+    if request.POST:
+        form = AddClientForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.save()
+            except:
+                messages(request, "Error al guardar")
+                return redirect('AddService')
+    return redirect('AddService')
+
 
 def edit_client_view(request):
     client = Client.objects.get(pk=request.POST.get('id_personal_editar'))
