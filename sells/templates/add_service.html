@@ -15,7 +15,7 @@
                 <h5 class="modal-title text-dark">Agregar nuevo</h5>
             </div>
             <div class="modal-body bg-dark text-white">
-                <form method="POST" action="{% url 'AddService' %}" enctype="multipart/form-data">{% csrf_token %}
+                <form method="POST" action="{% url 'AddClienteService' %}" enctype="multipart/form-data">{% csrf_token %}
                     {% for field in form_client %}
                     <p>{{field.label}} <br>
                         {{field|add_class:"form-control text-dark"}}</p>
@@ -312,6 +312,7 @@ document.getElementById('search').addEventListener('input', function() {
 });
 
 function loadGrommers() {
+    getPrinter();
     $.ajax({
             url: window.location.pathname,
             type: 'POST',
@@ -495,6 +496,24 @@ $(function () {
         }
     }
 });
+
+function getPrinter() {
+    PrinterEscPos.getPrinters().then(response => {
+        console.log(response);
+    });
+
+}
+
+function printTicket () {
+    const apiRouter = 'http://127.0.0.1:5656/'
+    var printer = new PrinterEscPos(apiRouter);
+    
+    printer.setImage("https://firebasestorage.googleapis.com/v0/b/flutterspacanino.appspot.com/o/LOGO%20JACKIAR-01.PNG?alt=media&token=562fd0cd-97f3-4ae0-913c-ffbf183ee361");
+    printer.setConfigure("center", font=a);
+    printer.setText("telefono: 3208501583");
+    printer.setText("hola");
+
+}
 
 function savePet() {
     const name = document.getElementById('petName').value;
