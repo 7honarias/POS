@@ -58,6 +58,7 @@ def service_view(request):
     services = Service.objects.all()
     
     if start_date and end_date:
+        print('here')
         start_date = parse_date(start_date)
         end_date = parse_date(end_date)
     else:
@@ -68,9 +69,11 @@ def service_view(request):
         end_date = make_aware(end_date, bogota_tz)
     
     services = services.filter(created__range=[start_date, end_date])
+    print(services)
     
     # Calcular el total de ventas filtradas
-    total_ventas = Service.objects.aggregate(Sum('total'))['total__sum'] or 0
+    total_ventas = services.aggregate(Sum('total'))['total__sum'] or 0
+    print(total_ventas)
     form_editar = EditarServiceForm()
     context = {
         'services': services,
@@ -288,7 +291,7 @@ class add_service(ListView):
                     grommer = grommer,
                     name = service,
                     code = service,
-                    comment = comentarios,
+                    comments = comentarios,
                     pet = pet,
                     status = "pendiente"
                 )
