@@ -3,7 +3,7 @@ class PrinterEscPos {
         this.apiRouter = apiPath;
         this.dataPrinter = [];
     }
-    static getPrinters = (apiPath="http://127.0.0.1:5656/")=> {
+    static getPrinters = (apiPath="http://127.0.0.1:5056/")=> {
         return $.ajax({
             type: "GET",
             url: apiPath+"printers",
@@ -80,7 +80,7 @@ class PrinterEscPos {
     printerIn = (namePrinter) =>{
         return $.ajax({
             type: "POST",
-            url: this.apiRouter+"command/" + namePrinter,
+            url: this.apiRouter+"command/POS-8",
             data: JSON.stringify(this.dataPrinter),
             dataType: "json",
             success: function (response) {

@@ -312,7 +312,7 @@ document.getElementById('search').addEventListener('input', function() {
 });
 
 function loadGrommers() {
-    getPrinter();
+    printTicket();
     $.ajax({
             url: window.location.pathname,
             type: 'POST',
@@ -505,13 +505,10 @@ function getPrinter() {
 }
 
 function printTicket () {
-    const apiRouter = 'http://127.0.0.1:5656/'
+    const apiRouter = 'http://127.0.0.1:5056/'
     var printer = new PrinterEscPos(apiRouter);
     
-    printer.setImage("https://firebasestorage.googleapis.com/v0/b/flutterspacanino.appspot.com/o/LOGO%20JACKIAR-01.PNG?alt=media&token=562fd0cd-97f3-4ae0-913c-ffbf183ee361");
-    printer.setConfigure("center", font=a);
-    printer.setText("telefono: 3208501583");
-    printer.setText("hola");
+    printer.printerIn("hola");
 
 }
 
