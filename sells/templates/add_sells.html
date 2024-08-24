@@ -568,8 +568,16 @@ $('#btn_pay').on('click', function () {
         verts.calculate();
     }
 });
+function printTicket () {
+    const apiRouter = 'http://127.0.0.1:5056/'
+    var printer = new PrinterEscPos(apiRouter);
+    
+    printer.printerIn("hola");
+
+}
+
     // Gudardar datos
-    function saveData() {
+function saveData() {
         if (parseFloat(verts.items.total) == 0) {
             Swal.fire({
                 icon: 'error',
@@ -619,6 +627,7 @@ $('#btn_pay').on('click', function () {
             },
             dataType: 'json',
         }).done(function (data) {
+            printTicket ();
             location.reload();
 
             if (data[1] == true){
