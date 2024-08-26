@@ -219,3 +219,6 @@ class Service(models.Model):
     
     def __str__(self):
         return self.name
+    def toJSON(self):
+        item = model_to_dict(self, exclude=['created', 'updated'])
+        return item
