@@ -278,9 +278,7 @@ class add_service(ListView):
                 grommerId = request.POST['grommer_id']
                 petId = request.POST['pet_id']
                 service = request.POST['service_id']
-                ticket = True
 
-                desglosar = False
                 client = Client.objects.get(id = id_cliente)
                 grommer = Grommer.objects.get(id=grommerId)
                 pet = Pet.objects.get(id=petId)
@@ -296,6 +294,9 @@ class add_service(ListView):
                     status = "pendiente"
                 )
                 service.save()
+                data['service'] = service.toJSON();
+                data['client'] = client.toJSON();
+                data['grommer'] = grommer.toJSON();
 
 
             if action == 'savePet':
@@ -392,6 +393,7 @@ class add_ventas(ListView):
                     total = product_data
                     product = ProductosSell(sell=sell, producto=producto, cantidad=product_data['cantidad'], entregado=True, precio=product_data['precio'], subtotal=product_data['subtotal'], iva=0, total=0)
                     product.save()
+                data['client'] = client.toJSON()
 
             else:
                 data['error'] = "Ha ocurrido un error"

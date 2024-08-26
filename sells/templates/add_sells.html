@@ -63,7 +63,7 @@
                             <td>{{i.name}}</td>
                             <td>$ {{i.price|currency}}</td>
                             <td>
-                                <button onclick="addProductList('{{i.id}}', '{{i.name}}','{{i.price}}')"
+                                <button onclick="addProductList('{{i.id}}', '{{i.code}}', '{{i.name}}','{{i.price}}')"
                                     class="btn btn-success" data-dismiss="modal" type="button">
                                     <i class="fas fa-share-square"></i>
                                 </button>
@@ -316,6 +316,7 @@
     var verts = {
         items: {
             total: 0.00,
+            client: {},
             products: [],
             pagado: 0.00,
             pendiente: 0.00,
@@ -473,6 +474,7 @@ function actualizarValores() {
     document.getElementById("monto_to_pay").value = formatToCOP(verts.items.total);
 }
 
+
 function formatToCOP(value) {
     return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP' });
 }
@@ -485,7 +487,7 @@ $('#btn_pay').on('click', function () {
 
 
     // Autocomplete
-    $(function () {
+$(function () {
     var selectingFirstItem = false; // Variable para controlar la selección del primer ítem
 
     $("#search").autocomplete({
@@ -556,6 +558,7 @@ $('#btn_pay').on('click', function () {
         } else {
             var producto = {
                 id: item.id,
+                code: item.code,
                 name: item.name,
                 cantidad: 1,
                 precio: item.price,
@@ -568,10 +571,43 @@ $('#btn_pay').on('click', function () {
         verts.calculate();
     }
 });
-function printTicket () {
+
+
+function printTicket (client) {
     const apiRouter = 'http://127.0.0.1:5056/'
     var printer = new PrinterEscPos(apiRouter);
+    printer.setConfigure("center", "a", true);
+    printer.setText("___JACKIAR___");
+    printer.setText("Cra. 70 # 22D-47\n");
+    printer.setConfigure();
+    printer.setText(`CC      :  ${client.code}`)
+    printer.setText(`Client  :  ${client.name}`)
+    printer.setText(`Telfono :  ${client.phone}`)
+    printer.setText(`Forma de pago : contado`)
+
+    printer.setText("------------------------------------------------\n")
+    printer.setText("#    Articulo          Cant              Total")
+    printer.setText("------------------------------------------------\n")
     
+    verts.items.products.forEach((item, index) => {
+        const number = parseFloat(item.precio);
+        
+        const formattedNumber = number.toLocaleString('es-CO');  
+        printer.setConfigure("right");    
+        printer.setText(`${index}   ${item.code}       ${item.cantidad}               ${formattedNumber}   `);
+        printer.setConfigure();      
+        printer.setText(`   ${item.name}`);
+
+    })
+    const totalPrice = parseFloat(verts.items.total);
+        
+    const formattedPrice = totalPrice.toLocaleString('es-CO');
+
+    printer.setText("------------------------------------------------\n")
+    printer.setConfigure("center")
+    printer.setText("Valor Total                           "+ formattedPrice)
+    printer.setText("\n");
+    printer.setQR("www.jackiar.com")
     printer.printerIn("hola");
 
 }
@@ -627,7 +663,7 @@ function saveData() {
             },
             dataType: 'json',
         }).done(function (data) {
-            printTicket ();
+            printTicket (data['client']);
             location.reload();
 
             if (data[1] == true){
@@ -677,9 +713,10 @@ function saveData() {
         // Cambio de precio
         
     // Agregar desde lista 
-    function addProductList(id_producto, name_producto, precio_producto) {
+    function addProductList(id_producto, code_producto, name_producto, precio_producto) {
         producto = {
             id: id_producto,
+            code: code_producto,
             name: name_producto,
             cantidad: 1,
             precio: precio_producto,
