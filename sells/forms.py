@@ -4,11 +4,12 @@ from sells.models import Client, Product, Category, Pet, Service
 class AddClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ('code', 'name', 'phone')
+        fields = ('code', 'name', 'phone', 'mail')
         labels = {
             'code': 'Cedula',
             'name': 'Nombre',
             'phone': 'Telefono',
+            'mail': 'correo'
         }
 
 class AddPetForm(forms.ModelForm):
