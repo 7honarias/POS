@@ -77,17 +77,21 @@ class PrinterEscPos {
         };
         this.dataPrinter.push(data);
     };
-    printerIn = (namePrinter) =>{
+    printerIn = (print) =>{
+        var data = {
+            list: this.dataPrinter,
+            print: print
+        }
         return $.ajax({
             type: "POST",
-            url: this.apiRouter+"command/POS-8",
-            data: JSON.stringify(this.dataPrinter),
+            url: this.apiRouter + "command/POS-8",
+            data: JSON.stringify(data),
             dataType: "json",
             success: function (response) {
                 if(response.status == "OK"){
                     console.log("success");
                 }else if(response.status == "ERROR"){
-                    console.log("error: "+response.error);
+                    console.log("error: " + response.error);
                 }
                 this.dataPrinter = [];
             },error: error =>{

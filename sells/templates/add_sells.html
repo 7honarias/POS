@@ -223,7 +223,7 @@
     <div class="col-4">
         <div class="input-group">
             <div class="input-group-append pr-1">
-                <h6>¿Desglosar iva?:</h6>
+                <h6>Imprimir factura:</h6>
             </div>
             <input required type="checkbox" class="form-control border border-dark bg-secondary text-white"
                 name="desglosar" id="desglosar">
@@ -575,11 +575,26 @@ $(function () {
 
 function printTicket (client) {
     const apiRouter = 'http://127.0.0.1:5056/'
+    const cb = document.querySelector('#desglosar');
     var printer = new PrinterEscPos(apiRouter);
+    const nuevaFecha = new Date();
+
+    // Formatear la fecha y hora usando toLocaleString con zona horaria UTC
+    const fechaFormateada = nuevaFecha.toLocaleString('es-PY', { 
+        timeZone: 'UTC', 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false // Formato de 24 horas
+    });
     printer.setConfigure("center", "a", true);
     printer.setText("___JACKIAR___");
     printer.setText("Cra. 70 # 22D-47\n");
     printer.setConfigure();
+    printer.setText(`Fecha   :  ${fechaFormateada}`)
     printer.setText(`CC      :  ${client.code}`)
     printer.setText(`Client  :  ${client.name}`)
     printer.setText(`Telfono :  ${client.phone}`)
@@ -594,7 +609,7 @@ function printTicket (client) {
         
         const formattedNumber = number.toLocaleString('es-CO');  
         printer.setConfigure("right");    
-        printer.setText(`${index}   ${item.code}       ${item.cantidad}               ${formattedNumber}   `);
+        printer.setText(`${index}   ${item.code}     ${item.cantidad}              ${formattedNumber} `);
         printer.setConfigure();      
         printer.setText(`   ${item.name}`);
 
@@ -608,81 +623,81 @@ function printTicket (client) {
     printer.setText("Valor Total                           "+ formattedPrice)
     printer.setText("\n");
     printer.setQR("www.jackiar.com")
-    printer.printerIn("hola");
+    printer.printerIn(cb.checked);
 
 }
 
     // Gudardar datos
 function saveData() {
-        if (parseFloat(verts.items.total) == 0) {
-            Swal.fire({
-                icon: 'error',
-                title: '',
-                text: "No hay ningún producto agregado a la lista",
-            });
-            //alert('{{last_id}}');
-            return
-        }
-        if (parseFloat(verts.items.pendiente) != 0){
-            Swal.fire({
-                icon: 'error',
-                title: '',
-                text: "agrega el pago",
-            });
-            //alert('{{last_id}}');
-            return
-        }
-
-        let desglosar;
-        const cb = document.querySelector('#desglosar');
-        if (cb.checked == true){
-            desglosar = 1;
-        }
-        else{
-            desglosar = 0;
-        }
-        $.ajax({
-            url: window.location.pathname,
-            type: 'POST',
-            data: {
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                'action': 'save',
-                'fecha': document.getElementById("fecha").value,
-                'id_cliente': document.getElementById("id_cliente").value,
-                'cliente': document.getElementById("cliente").value,
-                'comentarios': document.getElementById("comentarios").value,
-                'ticket': document.getElementById("impresion").value,
-                'efectivo': verts.items.efectivo,
-                'tarjeta': verts.items.tarjeta,
-                'transferencia': verts.items.transferencia,
-                'vales': 0,
-                'otro': 0,
-                'desglosar': desglosar,
-                'total': verts.items.total,
-                'verts': JSON.stringify(verts.items.products),
-            },
-            dataType: 'json',
-        }).done(function (data) {
-            printTicket (data['client']);
-            location.reload();
-
-            if (data[1] == true){
-                window.open("{% url 'ExportPDF' %}" + data[0] + "/" + data[2], '_blank');
-            }
-            //window.open("{% url 'ExportPDF' %}" + data[0], '_blank');
-            //location.reload();
-        }).fail(
-            function (jqXHR, textStatus, errorThrown) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: textStatus,
-                    footer: errorThrown
-                })
-            }).always(
-                function (data) {
-                });
+    if (parseFloat(verts.items.total) == 0) {
+        Swal.fire({
+            icon: 'error',
+            title: '',
+            text: "No hay ningún producto agregado a la lista",
+        });
+        //alert('{{last_id}}');
+        return
     }
+    if (parseFloat(verts.items.pendiente) != 0){
+        Swal.fire({
+            icon: 'error',
+            title: '',
+            text: "agrega el pago",
+        });
+        //alert('{{last_id}}');
+        return
+    }
+
+    let desglosar;
+    const cb = document.querySelector('#desglosar');
+    if (cb.checked == true){
+        desglosar = 1;
+    }
+    else{
+        desglosar = 0;
+    }
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            'action': 'save',
+            'fecha': document.getElementById("fecha").value,
+            'id_cliente': document.getElementById("id_cliente").value,
+            'cliente': document.getElementById("cliente").value,
+            'comentarios': document.getElementById("comentarios").value,
+            'ticket': document.getElementById("impresion").value,
+            'efectivo': verts.items.efectivo,
+            'tarjeta': verts.items.tarjeta,
+            'transferencia': verts.items.transferencia,
+            'vales': 0,
+            'otro': 0,
+            'desglosar': desglosar,
+            'total': verts.items.total,
+            'verts': JSON.stringify(verts.items.products),
+        },
+        dataType: 'json',
+    }).done(function (data) {
+        printTicket (data['client']);
+        location.reload();
+
+        if (data[1] == true){
+            window.open("{% url 'ExportPDF' %}" + data[0] + "/" + data[2], '_blank');
+        }
+        //window.open("{% url 'ExportPDF' %}" + data[0], '_blank');
+        //location.reload();
+    }).fail(
+        function (jqXHR, textStatus, errorThrown) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: textStatus,
+                footer: errorThrown
+            })
+        }).always(
+            function (data) {
+            });
+}
 
     $('#tableProducts tbody')
         // Remover item
