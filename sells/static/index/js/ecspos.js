@@ -77,6 +77,9 @@ class PrinterEscPos {
         };
         this.dataPrinter.push(data);
     };
+    reset = () => {
+        this.dataPrinter = [];
+    }
     printerIn = (print) =>{
         var data = {
             list: this.dataPrinter,
@@ -93,7 +96,6 @@ class PrinterEscPos {
                 }else if(response.status == "ERROR"){
                     console.log("error: " + response.error);
                 }
-                this.dataPrinter = [];
             },error: error =>{
                 console.log("error con el servidor");
                 console.log(error);
