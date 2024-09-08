@@ -86,11 +86,12 @@ function eliminarProducto(id) {
   document.getElementById("id_producto_eliminar").value = id;
 }
 
-function editarPersonal(id, code, name, phone) {
+function editarPersonal(id, code, name, phone, mail) {
   document.getElementById("id_personal_editar").value = id;
   document.getElementById("nombre_editar").value = name;
   document.getElementById("telefono_editar").value = phone;
   document.getElementById("code_editar").value = code;
+  document.getElementById("mail_editar").value = mail;
 }
 
 function editarService(id, code, name, status) {

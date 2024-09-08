@@ -609,7 +609,7 @@ function printTicket (client) {
         
         const formattedNumber = number.toLocaleString('es-CO');  
         printer.setConfigure("right");    
-        printer.setText(`${index}   ${item.code}     ${item.cantidad}              ${formattedNumber} `);
+        printer.setText(`${index}      ${item.code}      ${item.cantidad}              ${formattedNumber} `);
         printer.setConfigure();      
         printer.setText(`   ${item.name}`);
 
@@ -624,6 +624,7 @@ function printTicket (client) {
     printer.setText("\n");
     printer.setQR("www.jackiar.com")
     printer.printerIn(cb.checked);
+    printer.reset();
 
 }
 

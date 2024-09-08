@@ -519,18 +519,17 @@ function printTicket (date, comments, data) {
     printer.setText(`Client  :  ${cliente.name}`)
     printer.setText(`Telfono :  ${cliente.phone}`)
     printer.setText(`Forma de pago : contado`)
+    const totalPrice = parseFloat(service.price);
+        
+    const formattedPrice = totalPrice.toLocaleString('es-CO');
 
     printer.setText(`Groomer  :  ${grommer.name}`)
     printer.setText("------------------------------------------------\n")
     printer.setText("#    Service                              Total")
     printer.setText("------------------------------------------------\n")
-    printer.setText(`${service.id}  :  ${service.name}     ${service.price}  `)
+    printer.setText(`${service.id}  :  ${service.name}                 ${formattedPrice}  `)
 
     printer.setText(`comentarios: ${comments}`)
-    
-    const totalPrice = parseFloat(service.price);
-        
-    const formattedPrice = totalPrice.toLocaleString('es-CO');
 
     printer.setText("------------------------------------------------\n")
     printer.setConfigure("center")
@@ -541,10 +540,11 @@ function printTicket (date, comments, data) {
     printer.setText("____________________")
     printer.setText("Firma")
     printer.setText("\n");
-    printer.setText("Revise su mascota antes de retirarla, no se aceptan reclamos despues de 24 horas. si pasado 3 horas el propietario  no a venido por su mascotase cobrara guarderia a $3500 la hora y despues de 3 dias se dispondra de la mascota en la manera que Jackiar considere el propietario es consiente de que el bano y la peluqueria son prosedimientos estresantes para la mascota que pueden llevar a algun tipo de trauma fisico o mental incluyendo pero no limitando el fallecimiento por tanto exime  JACKIAR de cualquier eventualidad y compromete a cancelar el total de la cuenta nota solo se entregara la mascota a su propietario o a persona autorizada por el propietario con anterioridad presentando este recibo");
+    printer.setText("Revise su mascota antes de retirarla. No se\naceptan reclamos después de 24 horas. Si pasadas\n 2 horas el propietario no ha venido por su\n mascota, se cobrará guardería a $3.000 la hora.\n Después de 3 días, se dispondrá de la mascota\n de la manera que Jackiar considere.\nEl propietario es consciente de que el baño\ny la peluquería son procedimientos estresantes\npara la mascota, que pueden llevar a algún \ntipo de trauma físico o mental, incluyendo \npero no limitando al fallecimiento. Por tanto, \nexime a JACKIAR de cualquier eventualidad. \nEl propietario se compromete a cancelar el \ntotal de la cuenta. \n\nNota: Solo se entregará la mascota a su \npropietario o a una persona autorizada \npreviamente por el propietario, presentando \neste recibo.");
     printer.setQR("www.jackiar.com")
     printer.printerIn(true);
-
+    printer.printerIn(true);
+    printer.reset();
 }
 
 function savePet() {

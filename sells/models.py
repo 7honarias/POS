@@ -7,6 +7,7 @@ class Client(models.Model):
     code = models.CharField(max_length=200, null=True, blank=False)
     name = models.CharField(max_length=200, null=True, blank=False)
     phone = models.CharField(max_length=200, null=True, blank=False)
+    mail = models.CharField(max_length=200, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now_add=True)
 
