@@ -513,37 +513,37 @@ function printTicket (date, comments, data) {
     printer.setConfigure("center", "a", true);
     printer.setText("___JACKIAR___");
     printer.setText("Cra. 70 # 22D-47\n");
-    printer.setText("Nit: 1090508658-6")
-    printer.setText("Telefono: 3208501583")
+    printer.setText("Telefono: 3208501583");
+    printer.setText("\n");
     printer.setConfigure();
-    printer.setText(`Fecha   :  ${date}`)
-    printer.setText(`CC      :  ${cliente.code}`)
-    printer.setText(`Client  :  ${cliente.name}`)
-    printer.setText(`Telfono :  ${cliente.phone}`)
-    printer.setText(`Forma de pago : contado`)
+    printer.setText(`Fecha   :  ${date}`);
+    printer.setText(`CC      :  ${cliente.code}`);
+    printer.setText(`Client  :  ${cliente.name}`);
+    printer.setText(`Telfono :  ${cliente.phone}`);
+    printer.setText(`Forma de pago : contado`);
     const totalPrice = parseFloat(service.price);
         
     const formattedPrice = totalPrice.toLocaleString('es-CO');
 
-    printer.setText(`Groomer  :  ${grommer.name}`)
-    printer.setText("------------------------------------------------\n")
-    printer.setText("#    Service                              Total")
-    printer.setText("------------------------------------------------\n")
-    printer.setText(`${service.id}  :  ${service.name}                 ${formattedPrice}  `)
+    printer.setText(`Groomer  :  ${grommer.name}`);
+    printer.setText("------------------------------------------------\n");
+    printer.setText("#    Service                              Total");
+    printer.setText("------------------------------------------------\n");
+    printer.setText(`${service.id}  :  ${service.name}                 ${formattedPrice}  `);
 
-    printer.setText(`comentarios: ${comments}`)
+    printer.setText(`comentarios: ${comments}`);
 
-    printer.setText("------------------------------------------------\n")
-    printer.setConfigure("center")
-    printer.setText("Valor Total                           "+ formattedPrice)
+    printer.setText("------------------------------------------------\n");
+    printer.setConfigure("center");
+    printer.setText("Valor Total                           "+ formattedPrice);
     printer.setText("\n");
     printer.setText("\n");
     printer.setText("\n");
-    printer.setText("____________________")
-    printer.setText("Firma")
+    printer.setText("____________________");
+    printer.setText("Firma");
     printer.setText("\n");
     printer.setText("Revise su mascota antes de retirarla. No se\naceptan reclamos después de 24 horas. Si pasadas\n 2 horas el propietario no ha venido por su\n mascota, se cobrará guardería a $3.000 la hora.\n Después de 3 días, se dispondrá de la mascota\n de la manera que Jackiar considere.\nEl propietario es consciente de que el baño\ny la peluquería son procedimientos estresantes\npara la mascota, que pueden llevar a algún \ntipo de trauma físico o mental, incluyendo \npero no limitando al fallecimiento. Por tanto, \nexime a JACKIAR de cualquier eventualidad. \nEl propietario se compromete a cancelar el \ntotal de la cuenta. \n\nNota: Solo se entregará la mascota a su \npropietario o a una persona autorizada \npreviamente por el propietario, presentando \neste recibo.");
-    printer.setQR("www.jackiar.com")
+    printer.setQR("www.jackiar.com");
     printer.printerIn(true);
     printer.printerIn(true);
     printer.reset();
